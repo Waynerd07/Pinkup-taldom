@@ -100,74 +100,93 @@
     const timeInput = document.getElementById('time');
     const timeOptionsEl = document.getElementById('timeOptions');
 
-    const dates = [			 	
-	'25.05', 	
-	'26.05', 	
-	'29.05', 	
-	'30.05', 	
-	'02.06', 
-	'03.06', 
-	'06.06', 
-	'07.06', 
-	'10.06', 
-	'11.06', 
-	'14.06',
-	'15.06', 
-	'18.06',
-	'19.06', 
-	'22.06', 
-	'23.06', 
-	'26.06', 
-	'27.06', 
-	'29.06', 
-	'30.06'];
-    const currentYear = new Date().getFullYear();
+      const dates = [			
+  '22.05', '25.05', '26.05', '29.05', '30.05', '02.06', 
+  '03.06', '06.06', '07.06', '10.06', '11.06', '14.06',
+  '15.06', '18.06', '19.06', '22.06', '23.06', '26.06', 
+  '27.06', '29.06', '30.06'
+];
 
-    const activeDates = dates.map(d => {
-      const [day, month] = d.split('.');
-      return `${currentYear}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+const currentYear = new Date().getFullYear();
+
+// Преобразуем в формат YYYY-MM-DD
+const activeDates = dates.map(d => {
+  const [day, month] = d.split('.');
+  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+});
+
+// Уникальные временные слоты для каждой даты
+const datetimes = {
+  '2025-05-25': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-05-26': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-05-29': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-05-30': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-02': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-03': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-06': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-07': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-10': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-11': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-14': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-15': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-18': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-19': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-22': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-23': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-26': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-27': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-29': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-06-30': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+};
+
+function createCalendar() {
+  calendarEl.innerHTML = '';
+  activeDates.forEach(d => {
+    const dayNum = new Date(d).getDate();
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day active-date';
+    dayEl.textContent = dayNum;
+    dayEl.dataset.date = d;
+
+    dayEl.addEventListener('click', () => {
+      [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
+      dayEl.classList.add('selected-date');
+      dateInput.value = d;
+      showTimeOptions(d);
     });
 
-    function createCalendar() {
-      calendarEl.innerHTML = '';
-      activeDates.forEach(d => {
-        const dayNum = new Date(d).getDate();
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day active-date';
-        dayEl.textContent = dayNum;
-        dayEl.dataset.date = d;
+    calendarEl.appendChild(dayEl);
+  });
+}
 
-        dayEl.addEventListener('click', () => {
-          [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
-          dayEl.classList.add('selected-date');
-          dateInput.value = d;
-          showTimeOptions(d);
-        });
+// Показываем конкретные временные слоты для каждой даты
+function showTimeOptions(date) {
+  const times = datetimes[date] || [];
+  timeOptionsEl.innerHTML = '';
+  timeInput.value = ''; // сброс предыдущего выбора
 
-        calendarEl.appendChild(dayEl);
-      });
-    }
+  if (times.length === 0) {
+    const msg = document.createElement('div');
+    msg.textContent = 'Нет доступных времён';
+    msg.className = 'no-times';
+    timeOptionsEl.appendChild(msg);
+    return;
+  }
 
-    // Показываем 5 временных слотов
-    function showTimeOptions(date) {
-      const times = ['10:00', '12:00', '14:00', '16:00', '18:00'];
-      timeOptionsEl.innerHTML = '';
-      timeInput.value = ''; // сброс предыдущего выбора
+  times.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'time-option';
+    btn.textContent = t;
 
-      times.forEach(t => {
-        const btn = document.createElement('div');
-        btn.className = 'time-option';
-        btn.textContent = t;
+    btn.addEventListener('click', () => {
+      [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
+      btn.classList.add('selected');
+      timeInput.value = t;
+    });
 
-        btn.addEventListener('click', () => {
-          [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
-          btn.classList.add('selected');
-          timeInput.value = t;
-        });
-
-        timeOptionsEl.appendChild(btn);
-      });
-    }
+    timeOptionsEl.appendChild(btn);
+  });
+}
 
     document.getElementById('datetimeForm').addEventListener('submit', function(e) {
       e.preventDefault();
