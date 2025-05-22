@@ -100,54 +100,83 @@
     const timeInput = document.getElementById('time');
     const timeOptionsEl = document.getElementById('timeOptions');
 
-    const dates = ['04.06', '05.06', '08.06', '12.06', '13.06', '20.06', '21.06', '24.06', '25.06', '28.06', '29.06'];
-    const currentYear = new Date().getFullYear();
+  const dates = [
+  '04.06', '05.06', '08.06', '12.06', 
+  '13.06', '20.06', '21.06', '24.06', 
+  '25.06', '28.06', '29.06'
+  ];
 
-    const activeDates = dates.map(d => {
-      const [day, month] = d.split('.');
-      return `${currentYear}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+const currentYear = new Date().getFullYear();
+
+// Преобразуем в формат YYYY-MM-DD
+const activeDates = dates.map(d => {
+  const [day, month] = d.split('.');
+  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+});
+
+// Уникальные временные слоты для каждой даты
+const datetimes = {
+  '2025-06-04': ['12:00', '15:00'],
+  '2025-06-05': ['12:00', '15:00'],
+  '2025-06-08': ['12:00', '15:00'],
+  '2025-06-12': ['12:00', '15:00'],
+  '2025-06-13': ['12:00', '15:00'],
+  '2025-06-20': ['12:00', '15:00'],
+  '2025-06-21': ['12:00', '15:00'],
+  '2025-06-24': ['12:00', '15:00'],
+  '2025-06-25': ['12:00', '15:00'],
+  '2025-06-28': ['12:00', '15:00'],
+  '2025-06-29': ['12:00', '15:00'],
+};
+
+function createCalendar() {
+  calendarEl.innerHTML = '';
+  activeDates.forEach(d => {
+    const dayNum = new Date(d).getDate();
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day active-date';
+    dayEl.textContent = dayNum;
+    dayEl.dataset.date = d;
+
+    dayEl.addEventListener('click', () => {
+      [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
+      dayEl.classList.add('selected-date');
+      dateInput.value = d;
+      showTimeOptions(d);
     });
 
-    function createCalendar() {
-      calendarEl.innerHTML = '';
-      activeDates.forEach(d => {
-        const dayNum = new Date(d).getDate();
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day active-date';
-        dayEl.textContent = dayNum;
-        dayEl.dataset.date = d;
+    calendarEl.appendChild(dayEl);
+  });
+}
 
-        dayEl.addEventListener('click', () => {
-          [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
-          dayEl.classList.add('selected-date');
-          dateInput.value = d;
-          showTimeOptions(d);
-        });
+// Показываем конкретные временные слоты для каждой даты
+function showTimeOptions(date) {
+  const times = datetimes[date] || [];
+  timeOptionsEl.innerHTML = '';
+  timeInput.value = ''; // сброс предыдущего выбора
 
-        calendarEl.appendChild(dayEl);
-      });
-    }
+  if (times.length === 0) {
+    const msg = document.createElement('div');
+    msg.textContent = 'Нет доступных времён';
+    msg.className = 'no-times';
+    timeOptionsEl.appendChild(msg);
+    return;
+  }
 
-    // Показываем 5 временных слотов
-    function showTimeOptions(date) {
-      const times = ['12:00', '15:00',];
-      timeOptionsEl.innerHTML = '';
-      timeInput.value = ''; // сброс предыдущего выбора
+  times.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'time-option';
+    btn.textContent = t;
 
-      times.forEach(t => {
-        const btn = document.createElement('div');
-        btn.className = 'time-option';
-        btn.textContent = t;
+    btn.addEventListener('click', () => {
+      [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
+      btn.classList.add('selected');
+      timeInput.value = t;
+    });
 
-        btn.addEventListener('click', () => {
-          [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
-          btn.classList.add('selected');
-          timeInput.value = t;
-        });
-
-        timeOptionsEl.appendChild(btn);
-      });
-    }
+    timeOptionsEl.appendChild(btn);
+  });
+}
 
     document.getElementById('datetimeForm').addEventListener('submit', function(e) {
       e.preventDefault();
