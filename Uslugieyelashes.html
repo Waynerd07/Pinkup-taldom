@@ -9,8 +9,9 @@
     h2 { color: #333; }
     .summary { margin-bottom: 20px; font-size: 18px; }
   </style>
-  <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
-  <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
+<!-- Google Calendar Appointment Scheduling begin -->
+<link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
+<script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
 </head>
 <body>
 
@@ -24,16 +25,19 @@
     const summary = document.getElementById('serviceSummary');
     const selectedServices = JSON.parse(localStorage.getItem('selectedServices')) || [];
     summary.innerHTML = "Вы выбрали:<br>" + selectedServices.map(s => "• " + s).join("<br>");
-
-    window.addEventListener('load', function () {
-      calendar.schedulingButton.load({
-        url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ1XXLs3wIkoJaL-uPSbBWcTtaYLhwqv3it0lHE_DHanAeTbXaRmsdwXxEQnGGQDMQTOM1TVi5gS?gv=true',
-        color: '#039BE5',
-        label: 'Записаться через Google Календарь',
-        target: document.getElementById('google-calendar-button'),
-      });
+	
+(function() {
+  var target = document.currentScript;
+  window.addEventListener('load', function() {
+    calendar.schedulingButton.load({
+      url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ2DUq-F16znpbzLW4USCJVNnKHpgusLPeuz7nkZ9Kj-esmQipu5Hn033-O6mNjtKQ0NqKQuz--S?gv=true',
+      color: '#039BE5',
+      label: 'Записаться через Google Календарь',
+      target,
     });
-  </script>
-
+  });
+})();
 </body>
 </html>
+</script>
+<!-- end Google Calendar Appointment Scheduling -->
