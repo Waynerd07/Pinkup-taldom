@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Выбор даты и времени</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+    h2 { color: #333; }
+    .summary { margin-bottom: 20px; font-size: 18px; }
+    label { display: block; margin-top: 15px; font-size: 18px; }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 18px;
+      background-color: #28a8e9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #128C7E;
+    }
+
+    .calendar {
+      display: flex;
+      flex-wrap: wrap;
+      width: 280px;
+      margin-top: 10px;
+    }
+    .calendar-day {
+      width: 40px;
+      height: 40px;
+      margin: 3px;
+      line-height: 40px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .active-date {
+      background-color: #EC3B86;
+      color: white;
+    }
+    .inactive-date {
+      background-color: #ccc;
+      color: #666;
+      cursor: default;
+    }
+    .selected-date {
+      border: 3px solid #155724;
+    }
+
+    .time-options {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .time-option {
+      padding: 10px 15px;
+      background-color: #eee;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .time-option.selected {
+      background-color: #DF38D1;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Выберите дату и время</h2>
+  <div class="summary" id="serviceSummary"></div>
+
+  <form id="datetimeForm">
+    <label>Дата:</label>
+    <div id="calendar" class="calendar"></div>
+    <input type="hidden" id="date" required />
+    <input type="hidden" id="time" required />
+
+    <div id="timeOptions" class="time-options"></div>
+
+    <button type="submit">Продолжить в Telegram</button>
+  </form>
+
+  <script>
+    // Вывод выбранных услуг
+    const summary = document.getElementById('serviceSummary');
+    const selectedServices = JSON.parse(localStorage.getItem('selectedServices')) || [];
+    summary.innerHTML = "Вы выбрали:<br>" + selectedServices.map(s => "• " + s).join("<br>");
+
+    const calendarEl = document.getElementById('calendar');
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    const timeOptionsEl = document.getElementById('timeOptions');
+
+    const dates = ['04.06', '05.06', '08.06', '12.06', '13.06', '20.06', '21.06', '24.06', '25.06', '28.06', '29.06'];
+    const currentYear = new Date().getFullYear();
+
+    const activeDates = dates.map(d => {
+      const [day, month] = d.split('.');
+      return `${currentYear}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+    });
+
+    function createCalendar() {
+      calendarEl.innerHTML = '';
+      activeDates.forEach(d => {
+        const dayNum = new Date(d).getDate();
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day active-date';
+        dayEl.textContent = dayNum;
+        dayEl.dataset.date = d;
+
+        dayEl.addEventListener('click', () => {
+          [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
+          dayEl.classList.add('selected-date');
+          dateInput.value = d;
+          showTimeOptions(d);
+        });
+
+        calendarEl.appendChild(dayEl);
+      });
+    }
+
+    // Показываем 5 временных слотов
+    function showTimeOptions(date) {
+      const times = ['12:00', '15:00',];
+      timeOptionsEl.innerHTML = '';
+      timeInput.value = ''; // сброс предыдущего выбора
+
+      times.forEach(t => {
+        const btn = document.createElement('div');
+        btn.className = 'time-option';
+        btn.textContent = t;
+
+        btn.addEventListener('click', () => {
+          [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
+          btn.classList.add('selected');
+          timeInput.value = t;
+        });
+
+        timeOptionsEl.appendChild(btn);
+      });
+    }
+
+    document.getElementById('datetimeForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const date = dateInput.value;
+      const time = timeInput.value;
+
+      if (!date) {
+        alert("Пожалуйста, выберите дату.");
+        return;
+      }
+      if (!time) {
+        alert("Пожалуйста, выберите время.");
+        return;
+      }
+
+      const servicesText = selectedServices.join(" | ");
+      const message = `Здравствуйте! Хочу записаться на услуги: | ${servicesText}. | Дата: ${date} | время: ${time}.`;
+      const url = `https://t.me/kristofeeer?text=${encodeURIComponent(message)}`;
+
+      window.open(url, "_blank");
+    });
+
+    createCalendar();
+  </script>
+
+</body>
+</html>
