@@ -96,6 +96,7 @@
 
 <script>
   // Получаем услуги из localStorage
+      const summary = document.getElementById('serviceSummary');
   const servicesListEl = document.getElementById('servicesList');
   const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
   if (selectedServices.length === 0) {
@@ -105,52 +106,87 @@
   }
 
   const calendarEl = document.getElementById('calendar');
-
   const dateInput = document.getElementById('date');
   const timeOptionsEl = document.getElementById('timeOptions');
   const timeInput = document.getElementById('time');
+  const dates = [
+  '04.06', '05.06', '08.06', '09.06', '12.06', 
+  '13.06', '20.06', '21.06', '24.06', 
+  '25.06', '28.06', '29.06'
+  ];
 
-  function createCalendar() {
-    const today = new Date();
-    calendarEl.innerHTML = '';
-    for(let i=0; i<7; i++) {
-      let day = new Date(today);
-      day.setDate(today.getDate() + i);
+const currentYear = new Date().getFullYear();
 
-      let dayEl = document.createElement('div');
-      dayEl.classList.add('calendar-day', 'active-date');
-      dayEl.textContent = day.getDate();
-      dayEl.dataset.date = day.toISOString().split('T')[0];
+// Преобразуем в формат YYYY-MM-DD
+const activeDates = dates.map(d => {
+  const [day, month] = d.split('.');
+  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+});
 
-      dayEl.addEventListener('click', () => {
-        calendarEl.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected-date'));
-        dayEl.classList.add('selected-date');
+// Уникальные временные слоты для каждой даты
+const datetimes = {
+  '2025-06-04': ['12:00', '15:00'],
+  '2025-06-05': ['12:00', '15:00'],
+  '2025-06-08': ['12:00', '15:00'],
+  '2025-06-09': ['17:00'],
+  '2025-06-12': ['12:00', '15:00'],
+  '2025-06-13': ['12:00', '15:00'],
+  '2025-06-20': ['12:00', '15:00'],
+  '2025-06-21': ['12:00', '15:00'],
+  '2025-06-24': ['12:00', '15:00'],
+  '2025-06-25': ['12:00', '15:00'],
+  '2025-06-28': ['12:00', '15:00'],
+  '2025-06-29': ['12:00', '15:00'],
+};
 
-        dateInput.value = dayEl.dataset.date;
-        renderTimeOptions();
-      });
+function createCalendar() {
+  calendarEl.innerHTML = '';
+  activeDates.forEach(d => {
+    const dayNum = new Date(d).getDate();
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day active-date';
+    dayEl.textContent = dayNum;
+    dayEl.dataset.date = d;
 
-      calendarEl.appendChild(dayEl);
-    }
-  }
-
-  function renderTimeOptions() {
-    timeOptionsEl.innerHTML = '';
-    const times = ['10:00', '11:00', '12:00', '14:00', '15:00', '16:00'];
-    times.forEach(t => {
-      let timeEl = document.createElement('div');
-      timeEl.classList.add('time-option');
-      timeEl.textContent = t;
-
-      timeEl.addEventListener('click', () => {
-        timeOptionsEl.querySelectorAll('.time-option').forEach(te => te.classList.remove('selected'));
-        timeEl.classList.add('selected');
-        timeInput.value = t;
-      });
-
-      timeOptionsEl.appendChild(timeEl);
+    dayEl.addEventListener('click', () => {
+      [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
+      dayEl.classList.add('selected-date');
+      dateInput.value = d;
+      showTimeOptions(d);
     });
+
+    calendarEl.appendChild(dayEl);
+  });
+}
+
+// Показываем конкретные временные слоты для каждой даты
+function showTimeOptions(date) {
+  const times = datetimes[date] || [];
+  timeOptionsEl.innerHTML = '';
+  timeInput.value = ''; // сброс предыдущего выбора
+
+  if (times.length === 0) {
+    const msg = document.createElement('div');
+    msg.textContent = 'Нет доступных времён';
+    msg.className = 'no-times';
+    timeOptionsEl.appendChild(msg);
+    return;
   }
+
+  times.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'time-option';
+    btn.textContent = t;
+
+    btn.addEventListener('click', () => {
+      [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
+      btn.classList.add('selected');
+      timeInput.value = t;
+    });
+
+    timeOptionsEl.appendChild(btn);
+  });
+}
 
   createCalendar();
 
