@@ -6,23 +6,26 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
     h2 { color: #333; }
-    .summary { margin-bottom: 20px; font-size: 18px; }
     label { display: block; margin-top: 15px; font-size: 18px; }
-    button {
-      margin-top: 20px;
-      padding: 12px 25px;
+    input, button {
+      margin-top: 10px;
+      padding: 12px 15px;
       font-size: 18px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
       background-color: #28a8e9;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s;
     }
     button:hover {
       background-color: #128C7E;
     }
-
     .calendar {
       display: flex;
       flex-wrap: wrap;
@@ -45,15 +48,9 @@
       background-color: #EC3B86;
       color: white;
     }
-    .inactive-date {
-      background-color: #ccc;
-      color: #666;
-      cursor: default;
-    }
     .selected-date {
       border: 3px solid #155724;
     }
-
     .time-options {
       margin-top: 10px;
       display: flex;
@@ -75,133 +72,135 @@
 </head>
 <body>
 
-  <h2>Выберите дату и время</h2>
-  <div class="summary" id="serviceSummary"></div>
+  <h2>Запись на услуги</h2>
+
+  <div><strong>Выбранные услуги:</strong> <span id="servicesList"></span></div>
 
   <form id="datetimeForm">
+    <label for="name">Имя <span style="color:red">*</span></label>
+    <input type="text" id="name" name="name" placeholder="Ваше имя" required />
+
+    <label for="phone">Телефон <span style="color:red">*</span></label>
+<input type="tel" id="phone" name="phone" required />
+
     <label>Дата:</label>
     <div id="calendar" class="calendar"></div>
-    <input type="hidden" id="date" required />
-    <input type="hidden" id="time" required />
+    <input type="hidden" id="date" name="date" required />
 
+    <label>Время:</label>
     <div id="timeOptions" class="time-options"></div>
+    <input type="hidden" id="time" name="time" required />
 
-    <button type="submit">Продолжить в Telegram</button>
+    <button type="submit">Записаться</button>
   </form>
 
-  <script>
-    // Вывод выбранных услуг
-    const summary = document.getElementById('serviceSummary');
-    const selectedServices = JSON.parse(localStorage.getItem('selectedServices')) || [];
-    summary.innerHTML = "Вы выбрали:<br>" + selectedServices.map(s => "• " + s).join("<br>");
-
-    const calendarEl = document.getElementById('calendar');
-    const dateInput = document.getElementById('date');
-    const timeInput = document.getElementById('time');
-    const timeOptionsEl = document.getElementById('timeOptions');
-
-  const dates = [
-  '04.06', '05.06', '08.06', '09.06', '12.06', 
-  '13.06', '20.06', '21.06', '24.06', 
-  '25.06', '28.06', '29.06'
-  ];
-
-const currentYear = new Date().getFullYear();
-
-// Преобразуем в формат YYYY-MM-DD
-const activeDates = dates.map(d => {
-  const [day, month] = d.split('.');
-  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-});
-
-// Уникальные временные слоты для каждой даты
-const datetimes = {
-  '2025-06-04': ['12:00', '15:00'],
-  '2025-06-05': ['12:00', '15:00'],
-  '2025-06-08': ['12:00', '15:00'],
-  '2025-06-09': ['17:00'],
-  '2025-06-12': ['12:00', '15:00'],
-  '2025-06-13': ['12:00', '15:00'],
-  '2025-06-20': ['12:00', '15:00'],
-  '2025-06-21': ['12:00', '15:00'],
-  '2025-06-24': ['12:00', '15:00'],
-  '2025-06-25': ['12:00', '15:00'],
-  '2025-06-28': ['12:00', '15:00'],
-  '2025-06-29': ['12:00', '15:00'],
-};
-
-function createCalendar() {
-  calendarEl.innerHTML = '';
-  activeDates.forEach(d => {
-    const dayNum = new Date(d).getDate();
-    const dayEl = document.createElement('div');
-    dayEl.className = 'calendar-day active-date';
-    dayEl.textContent = dayNum;
-    dayEl.dataset.date = d;
-
-    dayEl.addEventListener('click', () => {
-      [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
-      dayEl.classList.add('selected-date');
-      dateInput.value = d;
-      showTimeOptions(d);
-    });
-
-    calendarEl.appendChild(dayEl);
-  });
-}
-
-// Показываем конкретные временные слоты для каждой даты
-function showTimeOptions(date) {
-  const times = datetimes[date] || [];
-  timeOptionsEl.innerHTML = '';
-  timeInput.value = ''; // сброс предыдущего выбора
-
-  if (times.length === 0) {
-    const msg = document.createElement('div');
-    msg.textContent = 'Нет доступных времён';
-    msg.className = 'no-times';
-    timeOptionsEl.appendChild(msg);
-    return;
+<script>
+  // Получаем услуги из localStorage
+  const servicesListEl = document.getElementById('servicesList');
+  const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+  if (selectedServices.length === 0) {
+    servicesListEl.textContent = 'Услуги не выбраны. Пожалуйста, выберите услуги на предыдущей странице.';
+  } else {
+    servicesListEl.textContent = selectedServices.join(', ');
   }
 
-  times.forEach(t => {
-    const btn = document.createElement('div');
-    btn.className = 'time-option';
-    btn.textContent = t;
+  const calendarEl = document.getElementById('calendar');
 
-    btn.addEventListener('click', () => {
-      [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
-      btn.classList.add('selected');
-      timeInput.value = t;
+  const dateInput = document.getElementById('date');
+  const timeOptionsEl = document.getElementById('timeOptions');
+  const timeInput = document.getElementById('time');
+
+  function createCalendar() {
+    const today = new Date();
+    calendarEl.innerHTML = '';
+    for(let i=0; i<7; i++) {
+      let day = new Date(today);
+      day.setDate(today.getDate() + i);
+
+      let dayEl = document.createElement('div');
+      dayEl.classList.add('calendar-day', 'active-date');
+      dayEl.textContent = day.getDate();
+      dayEl.dataset.date = day.toISOString().split('T')[0];
+
+      dayEl.addEventListener('click', () => {
+        calendarEl.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected-date'));
+        dayEl.classList.add('selected-date');
+
+        dateInput.value = dayEl.dataset.date;
+        renderTimeOptions();
+      });
+
+      calendarEl.appendChild(dayEl);
+    }
+  }
+
+  function renderTimeOptions() {
+    timeOptionsEl.innerHTML = '';
+    const times = ['10:00', '11:00', '12:00', '14:00', '15:00', '16:00'];
+    times.forEach(t => {
+      let timeEl = document.createElement('div');
+      timeEl.classList.add('time-option');
+      timeEl.textContent = t;
+
+      timeEl.addEventListener('click', () => {
+        timeOptionsEl.querySelectorAll('.time-option').forEach(te => te.classList.remove('selected'));
+        timeEl.classList.add('selected');
+        timeInput.value = t;
+      });
+
+      timeOptionsEl.appendChild(timeEl);
     });
+  }
 
-    timeOptionsEl.appendChild(btn);
+  createCalendar();
+
+  document.getElementById('datetimeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = this.name.value.trim();
+    const phone = this.phone.value.trim();
+    const date = this.date.value;
+    const time = this.time.value;
+	
+
+    if (!name) {
+      alert('Пожалуйста, введите имя.');
+      return;
+    }
+    if (!phone) {
+      alert('Пожалуйста, введите телефон.');
+      return;
+    }
+    if (!date) {
+      alert('Пожалуйста, выберите дату.');
+      return;
+    }
+    if (!time) {
+      alert('Пожалуйста, выберите время.');
+      return;
+    }
+    if (selectedServices.length === 0) {
+      alert('Пожалуйста, выберите услуги на предыдущей странице.');
+      return;
+    }
+
+    const data = {
+      name,
+      phone,
+      date,
+      time,
+      services: selectedServices.join(', ')
+    };
+
+    // Здесь отправка данных в Google Apps Script (замени URL)
+    fetch('https://script.google.com/macros/s/AKfycbybO-ANdsm6n_iYNdkoFQr8nM6hhq5uZ28PEvUvFZKDKL6W7Uu_aQ310PzBpc6sZzWLMA/exec', {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify(data)
+}).catch(() => {});
   });
-}
-
-    document.getElementById('datetimeForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const date = dateInput.value;
-      const time = timeInput.value;
-
-      if (!date) {
-        alert("Пожалуйста, выберите дату.");
-        return;
-      }
-      if (!time) {
-        alert("Пожалуйста, выберите время.");
-        return;
-      }
-
-      const servicesText = selectedServices.join(" | ");
-      const message = `Здравствуйте! Хочу записаться на услуги: | ${servicesText}. | Дата: ${date} | время: ${time}.`;
-      const url = `https://t.me/kristofeeer?text=${encodeURIComponent(message)}`;
-
-      window.open(url, "_blank");
-    });
-
-    createCalendar();
-  </script>
+</script>
 
 </body>
 </html>
