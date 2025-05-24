@@ -6,23 +6,26 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
     h2 { color: #333; }
-    .summary { margin-bottom: 20px; font-size: 18px; }
     label { display: block; margin-top: 15px; font-size: 18px; }
-    button {
-      margin-top: 20px;
-      padding: 12px 25px;
+    input, button {
+      margin-top: 10px;
+      padding: 12px 15px;
       font-size: 18px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
       background-color: #28a8e9;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s;
     }
     button:hover {
       background-color: #128C7E;
     }
-
     .calendar {
       display: flex;
       flex-wrap: wrap;
@@ -45,15 +48,9 @@
       background-color: #EC3B86;
       color: white;
     }
-    .inactive-date {
-      background-color: #ccc;
-      color: #666;
-      cursor: default;
-    }
     .selected-date {
       border: 3px solid #155724;
     }
-
     .time-options {
       margin-top: 10px;
       display: flex;
@@ -75,37 +72,49 @@
 </head>
 <body>
 
-  <h2>Выберите дату и время</h2>
-  <div class="summary" id="serviceSummary"></div>
+  <h2>Запись на услуги</h2>
+
+  <div><strong>Выбранные услуги:</strong> <span id="servicesList"></span></div>
 
   <form id="datetimeForm">
+    <label for="name">Имя <span style="color:red">*</span></label>
+    <input type="text" id="name" name="name" placeholder="Ваше имя" required />
+
+    <label for="phone">Телефон <span style="color:red">*</span></label>
+<input type="tel" id="phone" name="phone" required />
+
     <label>Дата:</label>
     <div id="calendar" class="calendar"></div>
-    <input type="hidden" id="date" required />
-    <input type="hidden" id="time" required />
+    <input type="hidden" id="date" name="date" required />
 
+    <label>Время:</label>
     <div id="timeOptions" class="time-options"></div>
+    <input type="hidden" id="time" name="time" required />
 
-    <button type="submit">Продолжить в Telegram</button>
+    <button type="submit">Записаться</button>
   </form>
 
-  <script>
-    // Вывод выбранных услуг
-    const summary = document.getElementById('serviceSummary');
-    const selectedServices = JSON.parse(localStorage.getItem('selectedServices')) || [];
-    summary.innerHTML = "Вы выбрали:<br>" + selectedServices.map(s => "• " + s).join("<br>");
+<script>
+  // Получаем услуги из localStorage
+      const summary = document.getElementById('serviceSummary');
+  const servicesListEl = document.getElementById('servicesList');
+  const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+  if (selectedServices.length === 0) {
+    servicesListEl.textContent = 'Услуги не выбраны. Пожалуйста, выберите услуги на предыдущей странице.';
+  } else {
+    servicesListEl.textContent = selectedServices.join(', ');
+  }
 
-    const calendarEl = document.getElementById('calendar');
-    const dateInput = document.getElementById('date');
-    const timeInput = document.getElementById('time');
-    const timeOptionsEl = document.getElementById('timeOptions');
-
-      const dates = [			
-  '22.05', '25.05', '26.05', '29.05', '30.05', '02.06', 
-  '03.06', '06.06', '07.06', '10.06', '11.06', '14.06',
-  '15.06', '18.06', '19.06', '22.06', '23.06', '26.06', 
-  '27.06', '29.06', '30.06'
-];
+  const calendarEl = document.getElementById('calendar');
+  const dateInput = document.getElementById('date');
+  const timeOptionsEl = document.getElementById('timeOptions');
+  const timeInput = document.getElementById('time');
+  
+  const dates = [
+  '25.05', '26.05', '29.05', '30.05', '02.06', '03.06', '06.06', '07.06', 
+  '10.06', '11.06', '14.06', '15.06', '18.06', '19.06', '22.06', '23.06',
+  '26.06', '27.06', '29.06', '30.06',
+  ];
 
 const currentYear = new Date().getFullYear();
 
@@ -117,26 +126,26 @@ const activeDates = dates.map(d => {
 
 // Уникальные временные слоты для каждой даты
 const datetimes = {
-  '2025-05-25': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-05-26': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-05-29': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-05-30': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-02': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-03': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-06': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-07': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-10': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-11': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-14': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-15': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-18': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-19': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-22': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-23': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-26': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-27': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-29': ['10:00', '12:00', '14:00', '16:00', '18:00'],
-  '2025-06-30': ['10:00', '12:00', '14:00', '16:00', '18:00'],
+  '2025-05-25': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-05-26': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-05-29': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-05-30': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-02': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-03': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-06': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-07': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-10': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-11': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-14': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-15': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-18': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-19': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-22': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-23': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-26': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-27': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-29': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
+  '2025-06-30': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
 };
 
 function createCalendar() {
@@ -188,29 +197,55 @@ function showTimeOptions(date) {
   });
 }
 
-    document.getElementById('datetimeForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const date = dateInput.value;
-      const time = timeInput.value;
+  createCalendar();
 
-      if (!date) {
-        alert("Пожалуйста, выберите дату.");
-        return;
-      }
-      if (!time) {
-        alert("Пожалуйста, выберите время.");
-        return;
-      }
+  document.getElementById('datetimeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-		const servicesText = selectedServices.join(" | ");
-      const message = `Здравствуйте! Хочу записаться на услуги: | ${servicesText}. | Дата: ${date} | время: ${time}.`;
-      const url = `https://t.me/garipovau?text=${encodeURIComponent(message)}`;
+    const name = this.name.value.trim();
+    const phone = this.phone.value.trim();
+    const date = this.date.value;
+    const time = this.time.value;
+	
 
-      window.open(url, "_blank");
-    });
+    if (!name) {
+      alert('Пожалуйста, введите имя.');
+      return;
+    }
+    if (!phone) {
+      alert('Пожалуйста, введите телефон.');
+      return;
+    }
+    if (!date) {
+      alert('Пожалуйста, выберите дату.');
+      return;
+    }
+    if (!time) {
+      alert('Пожалуйста, выберите время.');
+      return;
+    }
+    if (selectedServices.length === 0) {
+      alert('Пожалуйста, выберите услуги на предыдущей странице.');
+      return;
+    }
 
-    createCalendar();
-  </script>
+    const data = {
+      name,
+      phone,
+      date,
+      time,
+      services: selectedServices.join(', ')
+    };
+
+    // Здесь отправка данных в Google Apps Script (замени URL)
+    fetch('https://script.google.com/macros/s/AKfycbybO-ANdsm6n_iYNdkoFQr8nM6hhq5uZ28PEvUvFZKDKL6W7Uu_aQ310PzBpc6sZzWLMA/exec', {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify(data)
+}).catch(() => {});
+  });
+</script>
 
 </body>
 </html>
