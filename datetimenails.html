@@ -110,7 +110,7 @@
   const timeOptionsEl = document.getElementById('timeOptions');
   const timeInput = document.getElementById('time');
   const dates = [
-  '04.06', '05.06', '08.06', '09.06', '12.06', 
+  '04.06', '05.06', '08.06', '12.06', 
   '13.06', '20.06', '21.06', '24.06', 
   '25.06', '28.06', '29.06'
   ];
@@ -190,37 +190,27 @@ function showTimeOptions(date) {
 
   createCalendar();
 
-document.getElementById('datetimeForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+  document.getElementById('datetimeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-  const name = this.name.value.trim();
-  const phone = this.phone.value.trim();
-  const date = this.date.value;
-  const time = this.time.value;
+    const name = this.name.value.trim();
+    const phone = this.phone.value.trim();
+    const date = this.date.value;
+    const time = this.time.value;
+	
 
-  if (!name) {
-    alert('Пожалуйста, введите имя.');
-    return;
-  }
-  if (!phone) {
-    alert('Пожалуйста, введите телефон.');
-    return;
-  }
-  if (!date) {
-    alert('Пожалуйста, выберите дату.');
-    return;
-  }
-  if (!time) {
-    alert('Пожалуйста, выберите время.');
-    return;
-  }
-  if (selectedServices.length === 0) {
-    alert('Пожалуйста, выберите услуги на предыдущей странице.');
-    return;
-  }
-
-
-  alert("До встречи в Pinkup!");
+    if (!name) {
+      alert('Пожалуйста, введите имя.');
+      return;
+    }
+    if (!phone) {
+      alert('Пожалуйста, введите телефон.');
+      return;
+    }
+    if (!date) {
+      alert('Пожалуйста, выберите дату.');
+      return;
+    }
     if (!time) {
       alert('Пожалуйста, выберите время.');
       return;
@@ -237,6 +227,15 @@ document.getElementById('datetimeForm').addEventListener('submit', function(e) {
       time,
       services: selectedServices.join(', ')
     };
+
+    // Здесь отправка данных в Google Apps Script (замени URL)
+    fetch('https://script.google.com/macros/s/AKfycbybO-ANdsm6n_iYNdkoFQr8nM6hhq5uZ28PEvUvFZKDKL6W7Uu_aQ310PzBpc6sZzWLMA/exec', {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify(data)
+}).catch(() => {});
+  });
 </script>
 
 </body>
