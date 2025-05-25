@@ -95,32 +95,6 @@
   </form>
 
 <script>
-    const phoneInput = document.getElementById('phone');
-
-  phoneInput.addEventListener('input', function () {
-    let numbers = this.value.replace(/\D/g, '');
-
-    // Если начинается с 8 — заменим на 7
-    if (numbers.startsWith('8')) {
-      numbers = '7' + numbers.slice(1);
-    } else if (!numbers.startsWith('7')) {
-      numbers = '7' + numbers;
-    }
-
-    // Ограничим длину до 11 цифр
-    numbers = numbers.slice(0, 11);
-
-    // Форматируем для показа
-    let formatted = '+7';
-    if (numbers.length > 1) formatted += ' (' + numbers.slice(1, 4);
-    if (numbers.length >= 4) formatted += ') ' + numbers.slice(4, 7);
-    if (numbers.length >= 7) formatted += '-' + numbers.slice(7, 9);
-    if (numbers.length >= 9) formatted += '-' + numbers.slice(9, 11);
-
-    this.value = formatted;
-    this.dataset.cleaned = numbers; // сохраним «чистую» версию в data-атрибут
-  });
-  
   // Получаем услуги из localStorage
       const summary = document.getElementById('serviceSummary');
   const servicesListEl = document.getElementById('servicesList');
@@ -137,7 +111,7 @@
   const timeInput = document.getElementById('time');
   
   const dates = [
-  '26.05', '29.05', '30.05', '02.06', '03.06', '06.06', '07.06', 
+  '25.05', '26.05', '29.05', '30.05', '02.06', '03.06', '06.06', '07.06', 
   '10.06', '11.06', '14.06', '15.06', '18.06', '19.06', '22.06', '23.06',
   '26.06', '27.06', '29.06', '30.06',
   ];
@@ -152,6 +126,7 @@ const activeDates = dates.map(d => {
 
 // Уникальные временные слоты для каждой даты
 const datetimes = {
+  '2025-05-25': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
   '2025-05-26': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
   '2025-05-29': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
   '2025-05-30': ['10:00', '12:00', '14:00', '16:00', '18:00' ],
