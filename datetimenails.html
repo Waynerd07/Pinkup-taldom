@@ -81,7 +81,7 @@
     <input type="text" id="name" name="name" placeholder="Ваше имя" required />
 
     <label for="phone">Телефон <span style="color:red">*</span></label>
-    <input type="tel" id="phone" name="phone" placeholder="+7 (999) 999-99-99" required="" pattern="\+?[0-9\s\-\(\)]{10,20}">
+    <input type="tel" id="phone" name="phone" placeholder="8 (999) 999-99-99" required="" pattern="\+?[0-9\s\-\(\)]{10,20}">
 
     <label>Дата:</label>
     <div id="calendar" class="calendar"></div>
@@ -111,7 +111,7 @@
   const timeOptionsEl = document.getElementById('timeOptions');
   const timeInput = document.getElementById('time');
   const dates = [
-  '05.06', '08.06', '12.06', 
+  '08.06', '12.06', 
   '13.06', '20.06', '21.06', '24.06', 
   '25.06', '28.06', '29.06'
   ];
@@ -126,7 +126,6 @@ const activeDates = dates.map(d => {
 
 // Уникальные временные слоты для каждой даты
 const datetimes = {
-  '2025-06-05': ['15:00'],
   '2025-06-08': ['15:00'],
   '2025-06-09': ['17:00'],
   '2025-06-12': ['15:00'],
