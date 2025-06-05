@@ -73,15 +73,14 @@
 <body>
 
   <h2>Запись на услуги</h2>
-
   <div><strong>Выбранные услуги:</strong> <span id="servicesList"></span></div>
 
   <form id="datetimeForm">
     <label for="name">Имя <span style="color:red">*</span></label>
     <input type="text" id="name" name="name" placeholder="Ваше имя" required />
 
-    <label for="phone">Телефон <span style="color:red" >*</span></label>
-    <input type="tel" class="maskphone" id="phone" name="phone" placeholder="8 (999) 999-99-99" required="" pattern="\+?[0-9\s\-\(\)]{10,20}">
+    <label for="phone">Телефон <span style="color:red">*</span></label>
+    <input type="tel" class="maskphone" id="phone" name="phone" placeholder="7 (999) 999-99-99" required />
 
     <label>Дата:</label>
     <div id="calendar" class="calendar"></div>
@@ -91,11 +90,11 @@
     <div id="timeOptions" class="time-options"></div>
     <input type="hidden" id="time" name="time" required />
 
-      <button onclick="alert('До встречи в Pinkup!')">Записаться</button>
+    <button onclick="alert('До встречи в Pinkup!')">Записаться</button>
   </form>
 
 <script>
-  
+
 document.addEventListener("DOMContentLoaded", function() {
   var input = document.querySelector(".maskphone");
 
