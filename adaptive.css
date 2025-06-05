@@ -1,0 +1,9 @@
+@media only screen and (max-width: 550px){
+.container{
+
+    display: flex
+;
+    justify-content: center;
+    overflow: hidden;
+}
+}
