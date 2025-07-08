@@ -201,29 +201,33 @@ document.addEventListener("DOMContentLoaded", function() {
 
 const currentYear = new Date().getFullYear();
 
-// Преобразуем в формат YYYY-MM-DD
+// Преобразуем в формат -DD-MM-YYYY
 const activeDates = dates.map(d => {
   const [day, month] = d.split('.');
-  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${currentYear}`;
 });
 
 // Уникальные временные слоты для каждой даты
 const datetimes = {
-'2025-07-15': ['11:30', '14:30'],
-'2025-07-16': ['11:30', '14:30'],
-'2025-07-17': ['11:30', '14:30'],
-'2025-07-22': ['11:30', '14:30'],
-'2025-07-23': ['14:30'],
-'2025-07-28': ['11:30', '14:30'],
-'2025-07-29': ['11:30', '14:30'],
-'2025-07-30': ['11:30', '14:30'],
+'15-07-2025': ['11:30', '14:30'],
+'16-07-2025': ['11:30', '14:30'],
+'17-07-2025': ['11:30', '14:30'],
+'22-07-2025': ['11:30', '14:30'],
+'23-07-2025': ['14:30'],
+'28-07-2025': ['11:30', '14:30'],
+'29-07-2025': ['11:30', '14:30'],
+'30-07-2025': ['11:30', '14:30'],
   
 };
-
+  
 function createCalendar() {
   calendarEl.innerHTML = '';
   activeDates.forEach(d => {
-    const dayNum = new Date(d).getDate();
+    // Преобразуем DD-MM-YYYY → YYYY-MM-DD
+    const [dd, mm, yyyy] = d.split('-');
+    const jsDate = new Date(`${yyyy}-${mm}-${dd}`);
+    const dayNum = jsDate.getDate(); // теперь это число, а не NaN
+
     const dayEl = document.createElement('div');
     dayEl.className = 'calendar-day active-date';
     dayEl.textContent = dayNum;
