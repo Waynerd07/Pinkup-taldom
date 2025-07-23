@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head> 
+</div>
+  <meta charset="UTF-8" />
+  <title>Выбор даты и времени</title>
+
+  </head>
+  <style>
+body { 
+  font-family: Arial, sans-serif; 
+  margin: 0px; 
+  background-color: #f4f4f4; 
+}
+.header {
+  background: linear-gradient(to top, #e27662, #e6497b);
+  padding: 20px 20px;
+  text-align: center;
+  color: white;
+}
+
+.header h2 {
+  margin: 10px;
+  font-size: 28px;
+}
+
+label {
+  display: block; 
+  margin-top: 15px; font-size: 18px; 
+}
+
+input, button {
+  margin-top: 10px;
+  padding: 12px 15px;
+  font-size: 18px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #28a8e9;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #128C7E;
+}
+
+.container {
+  margin: 20px; 
+  margin-top: 20px; 
+}
+.calendar {
+  display: flex;
+  flex-wrap: wrap;
+  width: 280px;
+  margin-top: 10px;
+}
+
+.calendar-day {
+  width: 40px;
+  height: 40px;
+  margin: 3px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.active-date {
+  background-color: #EC3B86;
+  color: white;
+}
+
+.selected-date {
+  border: 3px solid #155724;
+}
+
+.time-options {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.time-option {
+  padding: 10px 15px;
+  background-color: #eee;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.time-option.selected {
+  background-color: #DF38D1;
+  color: white;
+}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+  <h2>Запись на услуги</h2>
+  </div>
+
+  <div class="container">
+  <div><strong>Выбранные услуги:</strong> 
+    <span id="servicesList"></span></div>
+
+  <form id="datetimeForm"></form>
+    <label for="name">Имя <span style="color:red">*</span></label>
+    <input type="text" id="name" name="name" placeholder="Ваше имя" required />
+
+    <label for="phone">Телефон <span style="color:red">*</span></label>
+    <input type="tel" class="maskphone" id="phone" name="phone" placeholder="7 (999) 999-99-99" required />
+
+    <label>Дата:</label>
+    <div id="calendar" class="calendar"></div>
+    <input type="hidden" id="date" name="date" required />
+
+    <label>Время:</label>
+    <div id="timeOptions" class="time-options"></div>
+    <input type="hidden" id="time" name="time" required />
+
+    <button type="submit">Записаться</button>
+  </form>
+  </div>
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+  var input = document.querySelector(".maskphone");
+
+  input.addEventListener("input", mask);
+  input.addEventListener("focus", mask);
+  input.addEventListener("blur", mask);
+
+  function mask(event) {
+    var blank = "+_ (___) ___-__-__";
+    var i = 0;
+    var val = this.value.replace(/\D/g, "").replace(/^8/, "7"); // заменяем 8 на 7
+
+    var formatted = blank.replace(/./g, function(char) {
+      if (/[_\d]/.test(char) && i < val.length) return val.charAt(i++);
+      return i >= val.length ? "" : char;
+    });
+
+    // Добавляем одинарную кавычку перед +7, если её ещё нет
+    if (formatted.startsWith("+7") && !formatted.startsWith("'+7")) {
+      formatted = "'" + formatted;
+    }
+
+    this.value = formatted;
+
+    if (event.type == "blur") {
+      if (this.value.length <= 2) this.value = "";
+    } else {
+      setCursorPosition(this, this.value.length);
+    }
+  }
+
+  function setCursorPosition(elem, pos) {
+    if (elem.setSelectionRange) {
+      elem.focus();
+      elem.setSelectionRange(pos, pos);
+    } else if (elem.createTextRange) {
+      var range = elem.createTextRange();
+      range.collapse(true);
+      range.moveEnd("character", pos);
+      range.moveStart("character", pos);
+      range.select();
+    }
+  }
+
+  /***/
+  function setCursorPosition(elem, pos) {
+    elem.focus();
+    
+    if (elem.setSelectionRange) {    
+      elem.setSelectionRange(pos, pos);
+      return;
+    }
+    
+    if (elem.createTextRange) {    
+      var range = elem.createTextRange();
+      range.collapse(true);
+      range.moveEnd("character", pos);
+      range.moveStart("character", pos);
+      range.select();      
+      return;
+    }
+  }
+});
+
+    const phoneInput = document.getElementById('phone');
+
+    phoneInput.addEventListener('input', () => {
+      let value = phoneInput.value;
+
+      // Если введённая строка начинается с 9 без префикса
+      if (/^9\d*/.test(value)) {
+        phoneInput.value = '+7' + value;
+      }
+
+      // Если пользователь ввёл 89..., заменяем 8 на +7
+      if (/^8\d{0,10}/.test(value)) {
+        phoneInput.value = '+7' + value.slice(1);
+      }
+    });
+    
+  // Получаем услуги из localStorage
+      const summary = document.getElementById('serviceSummary');
+  const servicesListEl = document.getElementById('servicesList');
+  const selectedServices = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+  if (selectedServices.length === 0) {
+    servicesListEl.textContent = 'Услуги не выбраны. Пожалуйста, выберите услуги на предыдущей странице.';
+  } else {
+    servicesListEl.textContent = selectedServices.join(', ');
+  }
+
+  const calendarEl = document.getElementById('calendar');
+  const dateInput = document.getElementById('date');
+  const timeOptionsEl = document.getElementById('timeOptions');
+  const timeInput = document.getElementById('time');
+  const dates = [
+  '14.07', '15.07', 
+  '16.07', '17.07', '18.07', '22.07', 
+  '23.07', '28.07', '29.07', '30.07'
+  ];
+
+const currentYear = new Date().getFullYear();
+
+// Преобразуем в формат YYYY-MM-DD
+const activeDates = dates.map(d => {
+  const [day, month] = d.split('.');
+  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+});
+
+// Уникальные временные слоты для каждой даты
+const datetimes = {
+'2025-07-14': ['11:30'],
+'2025-07-15': ['11:30', '14:30'],
+'2025-07-16': ['11:30', '14:30'],
+'2025-07-17': ['11:30', '14:30'],
+'2025-07-22': ['11:30', '14:30'],
+'2025-07-23': ['14:30'],
+'2025-07-28': ['11:30', '14:30'],
+'2025-07-29': ['11:30', '14:30'],
+'2025-07-30': ['11:30', '14:30'],
+  
+};
+
+function createCalendar() {
+  calendarEl.innerHTML = '';
+  activeDates.forEach(d => {
+    const dayNum = new Date(d).getDate();
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day active-date';
+    dayEl.textContent = dayNum;
+    dayEl.dataset.date = d;
+
+    dayEl.addEventListener('click', () => {
+      [...calendarEl.children].forEach(child => child.classList.remove('selected-date'));
+      dayEl.classList.add('selected-date');
+      dateInput.value = d;
+      showTimeOptions(d);
+    });
+
+    calendarEl.appendChild(dayEl);
+  });
+}
+
+// Показываем конкретные временные слоты для каждой даты
+function showTimeOptions(date) {
+  const times = datetimes[date] || [];
+  timeOptionsEl.innerHTML = '';
+  timeInput.value = ''; // сброс предыдущего выбора
+
+  if (times.length === 0) {
+    const msg = document.createElement('div');
+    msg.textContent = 'Нет доступных времён';
+    msg.className = 'no-times';
+    timeOptionsEl.appendChild(msg);
+    return;
+  }
+
+  times.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'time-option';
+    btn.textContent = t;
+
+    btn.addEventListener('click', () => {
+      [...timeOptionsEl.children].forEach(child => child.classList.remove('selected'));
+      btn.classList.add('selected');
+      timeInput.value = t;
+    });
+
+    timeOptionsEl.appendChild(btn);
+  });
+}
+
+  createCalendar();
+
+document.getElementById('datetimeForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const name = this.name.value.trim();
+  const phone = this.phone.value.trim();
+  const date = this.date.value;
+  const time = this.time.value;
+
+  if (!name) {
+    alert('Пожалуйста, введите имя.');
+    return;
+  }
+  if (!phone) {
+    alert('Пожалуйста, введите телефон.');
+    return;
+  }
+  if (!date) {
+    alert('Пожалуйста, выберите дату.');
+    return;
+  }
+  if (!time) {
+    alert('Пожалуйста, выберите время.');
+    return;
+  }
+  if (selectedServices.length === 0) {
+    alert('Пожалуйста, выберите услуги на предыдущей странице.');
+    return;
+  }
+
+  const data = {
+    name,
+    phone,
+    date,
+    time,
+    services: selectedServices.join(', ')
+  };
+
+  // Отправка
+  fetch('https://script.google.com/macros/s/AKfycbybO-ANdsm6n_iYNdkoFQr8nM6hhq5uZ28PEvUvFZKDKL6W7Uu_aQ310PzBpc6sZzWLMA/exec', {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  }).catch(() => {});
+
+  // Перенаправление через 1 секунду
+  setTimeout(() => {
+    window.location.href = 'thanks.html';
+  }, 1000);
+});
+</script>
+
+</body>
+</html>
