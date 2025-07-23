@@ -4,78 +4,111 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=0.8">
   <title>Выбор даты и времени</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-    h2 { color: #333; }
-    label { display: block; margin-top: 15px; font-size: 18px; }
-    input, button {
-      margin-top: 10px;
-      padding: 12px 15px;
-      font-size: 18px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #28a8e9;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #f8e9f1;
-    }
-    .calendar {
-      display: flex;
-      flex-wrap: wrap;
-      width: 280px;
-      margin-top: 10px;
-    }
-    .calendar-day {
-      width: 40px;
-      height: 40px;
-      margin: 3px;
-      line-height: 40px;
-      text-align: center;
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
-      font-weight: bold;
-      font-size: 16px;
-    }
-    .active-date {
-      background-color: #EC3B86;
-      color: white;
-    }
-    .selected-date {
-      border: 3px solid #155724;
-    }
-    .time-options {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .time-option {
-      padding: 10px 15px;
-      background-color: #eee;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .time-option.selected {
-      background-color: #DF38D1;
-      color: white;
-    }
-  </style>
+<style>
+body { 
+  font-family: Arial, sans-serif; 
+  margin: 0px;
+  background-color: #f4f4f4; 
+}
+.header {
+  background: linear-gradient(to top, #e27662, #e6497b);
+  padding: 20px 20px;
+  text-align: center;
+  color: white;
+}
+
+.header h2 {
+  margin: 10px;
+  font-size: 28px;
+}
+
+label { 
+   display: block; 
+   margin-top: 15px; 
+   font-size: 18px; 
+}
+
+input, button {
+  margin-top: 10px;
+  padding: 12px 15px;
+  font-size: 18px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+button {
+  background-color: #28a8e9;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+    
+button:hover {
+  background-color: #f8e9f1;
+}
+    
+.container {
+  margin: 20px; 
+  margin-top: 20px; 
+}
+    
+.calendar {
+  display: flex;
+  flex-wrap: wrap;
+  width: 280px;
+  margin-top: 10px;
+}
+    
+.calendar-day {
+  width: 40px;
+  height: 40px;
+  margin: 3px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: bold;
+  font-size: 16px;
+}
+.active-date {
+  background-color: #EC3B86;
+  color: white;
+}
+.selected-date {
+  border: 3px solid #155724;
+}
+.time-options {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.time-option {
+  padding: 10px 15px;
+  background-color: #eee;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.time-option.selected {
+  background-color: #DF38D1;
+  color: white;
+}
+</style>
 </head>
 <body>
+  <div class="header">
+    <h2>Запись на услуги</h2>
+  </div>
 
-  <h2>Запись на услуги:</h2>
-  <div><strong>Выбранные услуги:</strong> <span id="servicesList"></span></div>
+  <div class="container">
+  <div><strong>Выбранные услуги</strong> 
+    <span id="servicesList"></span></div>
 
+  
   <form id="datetimeForm">
     <label for="name">Имя <span style="color:red">*</span></label>
     <input type="text" id="name" name="name" placeholder="Ваше имя" required />
@@ -93,7 +126,7 @@
 
     <button type="submit" ">Записаться</button>
   </form>
-
+</div>
 <script>
 
 document.addEventListener("DOMContentLoaded", function() {
