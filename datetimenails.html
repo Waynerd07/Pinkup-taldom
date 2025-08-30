@@ -99,7 +99,7 @@
         <label>Телефон *</label>
         <input type="tel" id="phone" name="phone" placeholder="7 (999) 999-99-99" required>
 
-        <label>Дата:</label>
+        <label>Даты (Сентябрь):</label>
         <div id="calendar"></div>
 
         <input type="hidden" style="display: flex; flex-wrap: wrap;" id="selectedDate" name="selectedDate" required>
@@ -272,7 +272,7 @@ document.getElementById('datetimeForm').addEventListener('submit', function(e) {
     }).then(() => {
         // 2. Отправка в Google Таблицы
         const formData = new FormData(e.target);
-        fetch('https://script.google.com/macros/s/AKfycby0v0vB1GAlxdKSslmNF0JwOfktWkM54wOBY8_j_FUCzr7WJzwMoQZGEpWn8HodLTz0/exec', {
+        fetch('https://script.google.com/macros/s/AKfycbxsYzPaRSS-amErk7usEe0gbBYJNz0_WYw-WvdmKwKJLXn_G-7d2AQeo4SlLUak9JDsug/exec', {
             method: 'POST',
             body: formData
         })
@@ -289,6 +289,7 @@ document.addEventListener('DOMContentLoaded', loadDates);
 </script>
 </body>
 </html>
+
 
 
 
