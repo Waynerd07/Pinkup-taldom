@@ -272,7 +272,7 @@ document.getElementById('datetimeForm').addEventListener('submit', function(e) {
     }).then(() => {
         // 2. Отправка в Google Таблицы
         const formData = new FormData(e.target);
-        fetch('https://script.google.com/macros/s/AKfycbxsYzPaRSS-amErk7usEe0gbBYJNz0_WYw-WvdmKwKJLXn_G-7d2AQeo4SlLUak9JDsug/exec', {
+        fetch('https://script.google.com/macros/s/AKfycbxfWiqZ_VXNAI-ar3_JSJrw0okY1nvZk7YQp3FdBMT_HO9Cyvc1TdzKx8MZPTV6oKIFEg/exec', {
             method: 'POST',
             body: formData
         })
@@ -289,6 +289,7 @@ document.addEventListener('DOMContentLoaded', loadDates);
 </script>
 </body>
 </html>
+
 
 
 
